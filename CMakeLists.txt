@@ -17,6 +17,8 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
+SET(CMAKE_MACOSX_RPATH ON)
+
 ## Apply patch that fixes some Coverity errors
 
 ## Apply coverity patch to Squirrel?
