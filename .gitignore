@@ -1,0 +1,11 @@
+*.o
+*~
+.DS_Store
+/CMakeCache.txt
+/CMakeFiles/
+/Makefile
+/build*/
+/cmake_install.cmake
+/libsquirrel.so
+/libsquirrel.a
+/src/libsquirrel.a
