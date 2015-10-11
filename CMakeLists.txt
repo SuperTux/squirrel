@@ -67,3 +67,7 @@ SET(CMAKE_C_FLAGS "")
 ## define a target for building the library
 
 ADD_LIBRARY(squirrel ${SQUIRREL_SOURCES})
+
+INSTALL(TARGETS squirrel
+	ARCHIVE DESTINATION ${LIB_SUBDIR}
+	LIBRARY DESTINATION ${LIB_SUBDIR})
