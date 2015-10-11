@@ -68,6 +68,10 @@ SET(CMAKE_C_FLAGS "")
 
 ADD_LIBRARY(squirrel ${SQUIRREL_SOURCES})
 
+# use standardized variable name
+set(LIB_SUBDIR "lib${LIB_SUFFIX}"
+	CACHE STRING "Subdirectory of prefix into which libraries are installed (e.g., lib32, lib64)")
+
 INSTALL(TARGETS squirrel
 	ARCHIVE DESTINATION ${LIB_SUBDIR}
 	LIBRARY DESTINATION ${LIB_SUBDIR}
