@@ -71,9 +71,18 @@ SET(CMAKE_C_FLAGS "")
 ## define a target for building the library
 
 ADD_LIBRARY(squirrel ${SQUIRREL_SOURCES})
+
 GENERATE_EXPORT_HEADER( squirrel
              BASE_NAME squirrel
              EXPORT_MACRO_NAME SQUIRREL_API
              EXPORT_FILE_NAME squirrel_Export.h
              STATIC_DEFINE squirrel_BUILT_AS_STATIC
 )
+# use standardized variable name
+set(LIB_SUBDIR "lib${LIB_SUFFIX}"
+	CACHE STRING "Subdirectory of prefix into which libraries are installed (e.g., lib32, lib64)")
+
+INSTALL(TARGETS squirrel
+	ARCHIVE DESTINATION ${LIB_SUBDIR}
+	LIBRARY DESTINATION ${LIB_SUBDIR}
+	COMPONENT squirrel)
