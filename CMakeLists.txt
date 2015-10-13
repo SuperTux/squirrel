@@ -44,7 +44,11 @@ ENDIF(APPLY_COVERITY_PATCH)
 
 ## Add include/ to include directories
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include/)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include/ ${CMAKE_CURRENT_BINARY_DIR})
+
+## Fix Windows exports
+
+INCLUDE (GenerateExportHeader)
 
 ## build list of source files
 
@@ -67,3 +71,9 @@ SET(CMAKE_C_FLAGS "")
 ## define a target for building the library
 
 ADD_LIBRARY(squirrel ${SQUIRREL_SOURCES})
+GENERATE_EXPORT_HEADER( squirrel
+             BASE_NAME squirrel
+             EXPORT_MACRO_NAME SQUIRREL_API
+             EXPORT_FILE_NAME squirrel_Export.h
+             STATIC_DEFINE squirrel_BUILT_AS_STATIC
+)
