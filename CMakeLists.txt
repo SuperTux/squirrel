@@ -83,6 +83,7 @@ set(LIB_SUBDIR "lib${LIB_SUFFIX}"
 	CACHE STRING "Subdirectory of prefix into which libraries are installed (e.g., lib32, lib64)")
 
 INSTALL(TARGETS squirrel
+    RUNTIME DESTINATION bin
 	ARCHIVE DESTINATION ${LIB_SUBDIR}
 	LIBRARY DESTINATION ${LIB_SUBDIR}
 	COMPONENT squirrel)
