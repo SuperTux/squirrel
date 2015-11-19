@@ -10,14 +10,16 @@ struct SQClass;
 struct SQClosure : public CHAINABLE_OBJ
 {
 private:
-    SQClosure(SQSharedState *ss,SQFunctionProto *func): _outervalues(NULL), _defaultparams(NULL) {_function = func; __ObjAddRef(_function); _base = NULL; INIT_CHAIN();ADD_TO_CHAIN(&_ss(this)->_gc_chain,this); _env = NULL;}
+	SQClosure(SQSharedState *ss,SQFunctionProto *func){_function = func; __ObjAddRef(_function); _base = NULL; INIT_CHAIN();ADD_TO_CHAIN(&_ss(this)->_gc_chain,this); _env = NULL; _root=NULL;}
 public:
-	static SQClosure *Create(SQSharedState *ss,SQFunctionProto *func){
+	static SQClosure *Create(SQSharedState *ss,SQFunctionProto *func,SQWeakRef *root){
 		SQInteger size = _CALC_CLOSURE_SIZE(func);
 		SQClosure *nc=(SQClosure*)SQ_MALLOC(size);
 		new (nc) SQClosure(ss,func);
 		nc->_outervalues = (SQObjectPtr *)(nc + 1);
 		nc->_defaultparams = &nc->_outervalues[func->_noutervalues];
+		nc->_root = root;
+		 __ObjAddRef(nc->_root);
 		_CONSTRUCT_VECTOR(SQObjectPtr,func->_noutervalues,nc->_outervalues);
 		_CONSTRUCT_VECTOR(SQObjectPtr,func->_ndefaultparams,nc->_defaultparams);
 		return nc;
@@ -31,11 +33,16 @@ public:
 		this->~SQClosure();
 		sq_vm_free(this,size);
 	}
-	
+	void SetRoot(SQWeakRef *r)
+	{
+		__ObjRelease(_root);
+		_root = r;
+		__ObjAddRef(_root);
+	}
 	SQClosure *Clone()
 	{
 		SQFunctionProto *f = _function;
-		SQClosure * ret = SQClosure::Create(_opt_ss(this),f);
+		SQClosure * ret = SQClosure::Create(_opt_ss(this),f,_root);
 		ret->_env = _env;
 		if(ret->_env) __ObjAddRef(ret->_env);
 		_COPY_VECTOR(ret->_outervalues,_outervalues,f->_noutervalues);
@@ -56,6 +63,7 @@ public:
 	SQObjectType GetType() {return OT_CLOSURE;}
 #endif
 	SQWeakRef *_env;
+	SQWeakRef *_root;
 	SQClass *_base;
 	SQFunctionProto *_function;
 	SQObjectPtr *_outervalues;
@@ -139,7 +147,7 @@ public:
 struct SQNativeClosure : public CHAINABLE_OBJ
 {
 private:
-	SQNativeClosure(SQSharedState *ss,SQFUNCTION func): _nparamscheck(0), _outervalues(NULL), _noutervalues(0){_function=func;INIT_CHAIN();ADD_TO_CHAIN(&_ss(this)->_gc_chain,this); _env = NULL;}
+	SQNativeClosure(SQSharedState *ss,SQFUNCTION func){_function=func;INIT_CHAIN();ADD_TO_CHAIN(&_ss(this)->_gc_chain,this); _env = NULL;}
 public:
 	static SQNativeClosure *Create(SQSharedState *ss,SQFUNCTION func,SQInteger nouters)
 	{

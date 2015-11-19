@@ -11,8 +11,8 @@ enum SQOuterType {
 
 struct SQOuterVar
 {
-
-	SQOuterVar() : _type(otLOCAL) {}
+	
+	SQOuterVar(){}
 	SQOuterVar(const SQObjectPtr &name,const SQObjectPtr &src,SQOuterType t)
 	{
 		_name = name;

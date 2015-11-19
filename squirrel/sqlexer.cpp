@@ -18,24 +18,7 @@
 #define TERMINATE_BUFFER() {_longstr.push_back(_SC('\0'));}
 #define ADD_KEYWORD(key,id) _keywords->NewSlot( SQString::Create(ss, _SC(#key)) ,SQInteger(id))
 
-SQLexer::SQLexer() :
-  _curtoken(0),
-  _keywords(NULL),
-  _reached_eof(false),
-  _prevtoken(0),
-  _currentline(0),
-  _lasttokenline(0),
-  _currentcolumn(0),
-  _svalue(NULL),
-  _nvalue(0),
-  _fvalue(0.0),
-  _readf(NULL),
-  _up(NULL),
-  _currdata('\0'),
-  _sharedstate(NULL),
-  _errfunc(NULL),
-  _errtarget(NULL)
-{}
+SQLexer::SQLexer(){}
 SQLexer::~SQLexer()
 {
 	_keywords->Release();
@@ -82,6 +65,8 @@ void SQLexer::Init(SQSharedState *ss, SQLEXREADFUNC rg, SQUserPointer up,Compile
 	ADD_KEYWORD(static,TK_STATIC);
 	ADD_KEYWORD(enum,TK_ENUM);
 	ADD_KEYWORD(const,TK_CONST);
+	ADD_KEYWORD(__LINE__,TK___LINE__);
+    ADD_KEYWORD(__FILE__,TK___FILE__);
 
 	_readf = rg;
 	_up = up;
@@ -165,11 +150,11 @@ SQInteger SQLexer::Lex()
 			case _SC('='):
 				NEXT();
 				RETURN_TOKEN(TK_DIVEQ);
-				break;
+				continue;
 			case _SC('>'):
 				NEXT();
 				RETURN_TOKEN(TK_ATTR_CLOSE);
-				break;
+				continue;
 			default:
 				RETURN_TOKEN('/');
 			}
@@ -209,7 +194,6 @@ SQInteger SQLexer::Lex()
 			NEXT();
 			if (CUR_CHAR != _SC('=')){ RETURN_TOKEN('!')}
 			else { NEXT(); RETURN_TOKEN(TK_NE); }
-            break;
 		case _SC('@'): {
 			SQInteger stype;
 			NEXT();
@@ -221,7 +205,6 @@ SQInteger SQLexer::Lex()
 			}
 			Error(_SC("error parsing the string"));
 					   }
-            break;
 		case _SC('"'):
 		case _SC('\''): {
 			SQInteger stype;
@@ -230,7 +213,6 @@ SQInteger SQLexer::Lex()
 			}
 			Error(_SC("error parsing the string"));
 			}
-            break;
 		case _SC('{'): case _SC('}'): case _SC('('): case _SC(')'): case _SC('['): case _SC(']'):
 		case _SC(';'): case _SC(','): case _SC('?'): case _SC('^'): case _SC('~'):
 			{SQInteger ret = CUR_CHAR;
@@ -296,10 +278,10 @@ SQInteger SQLexer::Lex()
 	return 0;    
 }
 	
-SQInteger SQLexer::GetIDType(SQChar *s)
+SQInteger SQLexer::GetIDType(const SQChar *s,SQInteger len)
 {
 	SQObjectPtr t;
-	if(_keywords->Get(SQString::Create(_sharedstate, s), t)) {
+	if(_keywords->GetStr(s,len, t)) {
 		return SQInteger(_integer(t));
 	}
 	return TK_IDENTIFIER;
@@ -501,7 +483,7 @@ SQInteger SQLexer::ReadID()
 		NEXT();
 	} while(scisalnum(CUR_CHAR) || CUR_CHAR == _SC('_'));
 	TERMINATE_BUFFER();
-	res = GetIDType(&_longstr[0]);
+	res = GetIDType(&_longstr[0],_longstr.size() - 1);
 	if(res == TK_IDENTIFIER || res == TK_CONSTRUCTOR) {
 		_svalue = &_longstr[0];
 	}
