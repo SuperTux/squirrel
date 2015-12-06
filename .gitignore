@@ -10,3 +10,4 @@
 /libsquirrel.a
 /libsquirrel.dylib
 /src/libsquirrel.a
+/squirrel_Export.h
