@@ -70,6 +70,7 @@ SET(CMAKE_C_FLAGS "")
 
 ## define a target for building the library
 
+LIST(SORT SQUIRREL_SOURCES)
 ADD_LIBRARY(squirrel ${SQUIRREL_SOURCES})
 
 GENERATE_EXPORT_HEADER( squirrel
