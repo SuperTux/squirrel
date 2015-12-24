@@ -17,6 +17,8 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
+CMAKE_MINIMUM_REQUIRED(VERSION 3.3)
+
 SET(CMAKE_MACOSX_RPATH ON)
 
 ## Apply patch that fixes some Coverity errors
@@ -60,12 +62,14 @@ OPTION(ENABLE_SQDBG "Build squirrel script interpreter with debugging options" O
 IF(ENABLE_SQDBG)
   INCLUDE_DIRECTORIES (${CMAKE_CURRENT_SOURCE_DIR}/squirrel/)
   FILE(GLOB SQDBG_SOURCES sqdbg/*.cpp)
+  LIST(REMOVE_ITEM SQDBG_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/sqdbg/main.cpp)
   SET(SQUIRREL_SOURCES ${SQDBG_SOURCES} ${SQUIRREL_SOURCES})
+  ADD_EXECUTABLE(sqdbg sqdbg/main.cpp ${SQUIRREL_SOURCES})
 ENDIF(ENABLE_SQDBG)
 
 # the squirrel sources are out of our control so don't be too pedantic about
 # them
-SET(CMAKE_CXX_FLAGS "")
+SET(CMAKE_CXX_FLAGS "-lcurses")
 SET(CMAKE_C_FLAGS "")
 
 ## define a target for building the library
@@ -82,6 +86,8 @@ GENERATE_EXPORT_HEADER( squirrel
 # use standardized variable name
 set(LIB_SUBDIR "lib${LIB_SUFFIX}"
 	CACHE STRING "Subdirectory of prefix into which libraries are installed (e.g., lib32, lib64)")
+
+ADD_EXECUTABLE(sq sq/sq.c ${SQUIRREL_SOURCES})
 
 IF(SQUIRREL_IS_SUBPROJECT)
 	IF(BUILD_SHARED_LIBS)
