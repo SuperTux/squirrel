@@ -53,6 +53,7 @@ INCLUDE (GenerateExportHeader)
 ## build list of source files
 
 FILE(GLOB SQUIRREL_SOURCES squirrel/*.cpp sqstdlib/*.cpp sqstdlib/*.c)
+FILE(GLOB SQUIRREL_HEADERS include/*.h)
 
 ## Add in squirrel debug stuff
 
@@ -95,4 +96,6 @@ ELSE()
 		ARCHIVE DESTINATION ${LIB_SUBDIR}
 		LIBRARY DESTINATION ${LIB_SUBDIR}
 		COMPONENT squirrel)
+	INSTALL(FILES ${SQUIRREL_HEADERS} ${CMAKE_BINARY_DIR}/squirrel_Export.h
+		DESTINATION include)
 ENDIF()
